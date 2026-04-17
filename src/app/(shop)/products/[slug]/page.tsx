@@ -13,6 +13,7 @@ import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NotFoundError } from "@/lib/api/response";
 import { CURRENCY } from "@/lib/constants";
+import { auth } from "@/lib/auth";
 import { getProductDetailService, getRelatedProductsService } from "@/lib/services/product";
 
 interface Params {
@@ -55,7 +56,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<Pa
   const product = await safeGetProduct(slug);
   if (!product) notFound();
 
-  const related = await getRelatedProductsService(slug, 4);
+  const [related, session] = await Promise.all([getRelatedProductsService(slug, 4), auth()]);
+  const isAuthenticated = Boolean(session?.user?.id);
 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
@@ -178,8 +180,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<Pa
             <ProductPurchasePanel
               productId={product.id}
               productName={product.name}
+              productSlug={product.slug}
               basePrice={product.basePrice}
               variants={product.fullVariants}
+              isAuthenticated={isAuthenticated}
             />
 
             {product.badges.length > 0 ? (

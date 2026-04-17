@@ -1,17 +1,21 @@
 "use client";
 
 import * as React from "react";
-import { Minus, Plus, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { Loader2, Minus, Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { addToCartAction } from "@/lib/actions/cart";
 import VariantSelector, { type VariantOption } from "./VariantSelector";
 import type { ProductVariantFull } from "@/types/api/products";
 
 export interface ProductPurchasePanelProps {
   productId: string;
   productName: string;
+  productSlug: string;
   basePrice: number;
   variants: ProductVariantFull[];
+  isAuthenticated: boolean;
 }
 
 const LOW_STOCK_THRESHOLD = 5;
@@ -29,9 +33,12 @@ function toVariantOptions(variants: ProductVariantFull[]): VariantOption[] {
 }
 
 export default function ProductPurchasePanel({
+  productId,
   productName,
+  productSlug,
   basePrice,
   variants,
+  isAuthenticated,
 }: ProductPurchasePanelProps) {
   const { toast } = useToast();
   const options = React.useMemo(() => toVariantOptions(variants), [variants]);
@@ -40,23 +47,57 @@ export default function ProductPurchasePanel({
     firstInStock ? firstInStock.id : null,
   );
   const [quantity, setQuantity] = React.useState(1);
+  const [pending, startTransition] = React.useTransition();
 
   const selected = options.find((v) => v.id === selectedId) ?? null;
   const maxQty = selected ? Math.min(selected.stock, 10) : 1;
   const outOfStock = !selected || selected.stock <= 0;
 
+  const signInHref = `/login?next=${encodeURIComponent(`/products/${productSlug}`)}`;
+
   const handleAdd = () => {
     if (outOfStock || !selected) return;
-    toast({
-      title: "Added to cart",
-      description: `${productName} · ${selected.name} × ${quantity} (stub)`,
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to add to cart",
+        description: "Your cart is saved to your account.",
+        action: (
+          <Link
+            href={signInHref}
+            className="inline-flex h-8 items-center rounded-full bg-[var(--accent)] px-3 text-xs font-medium text-white hover:bg-[var(--accent)]/90 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            Sign in
+          </Link>
+        ),
+      });
+      return;
+    }
+    startTransition(async () => {
+      const res = await addToCartAction({
+        productId,
+        variantId: selected.id,
+        quantity,
+      });
+      if (res.ok) {
+        toast({
+          title: "Added to cart",
+          description: `${productName} · ${selected.name} × ${quantity}`,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Could not add to cart",
+          description: res.error.message,
+          variant: "destructive",
+        });
+      }
     });
   };
 
   const handleNotify = () => {
     toast({
-      title: "We&apos;ll let you know",
-      description: "You&apos;ll get an email when this variant is back in stock.",
+      title: "We'll let you know",
+      description: "You'll get an email when this variant is back in stock.",
     });
   };
 
@@ -118,9 +159,17 @@ export default function ProductPurchasePanel({
             Notify me when available
           </Button>
         ) : (
-          <Button size="lg" onClick={handleAdd}>
-            <ShoppingBag className="size-4" strokeWidth={1.5} aria-hidden />
-            Add to cart
+          <Button size="lg" onClick={handleAdd} disabled={pending} aria-live="polite">
+            {pending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" /> Adding
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="size-4" strokeWidth={1.5} aria-hidden />
+                Add to cart
+              </>
+            )}
           </Button>
         )}
       </div>

@@ -6,6 +6,7 @@ import { Heart, Menu, ShoppingBag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import SearchAutocomplete from "@/components/shop/SearchAutocomplete";
+import { useCartDrawer } from "@/components/shared/CartDrawer";
 import { cn } from "@/lib/utils/cn";
 
 const NAV_ITEMS = [
@@ -14,12 +15,9 @@ const NAV_ITEMS = [
   { href: "/about", label: "About" },
 ] as const;
 
-interface HeaderProps {
-  cartCount?: number;
-}
-
-export default function Header({ cartCount = 0 }: HeaderProps) {
+export default function Header() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { open: openCartDrawer, count: cartCount } = useCartDrawer();
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--bg)]/85 backdrop-blur supports-[backdrop-filter]:bg-[var(--bg)]/70">
@@ -93,13 +91,15 @@ export default function Header({ cartCount = 0 }: HeaderProps) {
           >
             <User className="size-5" strokeWidth={1.5} />
           </Link>
-          <Link
-            href="/cart"
+          <button
+            type="button"
+            onClick={openCartDrawer}
             className={cn(
               "relative inline-flex size-10 items-center justify-center rounded-full text-[var(--ink)] transition-colors hover:bg-[var(--bg-alt)]",
               "focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:outline-none",
             )}
             aria-label={`Cart (${cartCount} items)`}
+            aria-haspopup="dialog"
           >
             <ShoppingBag className="size-5" strokeWidth={1.5} />
             {cartCount > 0 ? (
@@ -107,7 +107,7 @@ export default function Header({ cartCount = 0 }: HeaderProps) {
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             ) : null}
-          </Link>
+          </button>
         </div>
       </div>
     </header>
