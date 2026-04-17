@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { SECURITY_HEADERS_ADDITIONS } from "./src/lib/auth/security-headers";
 
 const securityHeaders = [
   {
@@ -12,6 +13,7 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
+  ...SECURITY_HEADERS_ADDITIONS,
 ];
 
 const nextConfig: NextConfig = {
