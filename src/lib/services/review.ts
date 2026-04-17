@@ -374,6 +374,16 @@ export async function adminModerateReview(
   return reviewDocToDTO(doc, authorName, undefined);
 }
 
+export async function adminGetReview(reviewId: string): Promise<ReviewDTO | null> {
+  await connectDb();
+  if (!Types.ObjectId.isValid(reviewId)) return null;
+  const doc = await getReviewById(reviewId);
+  if (!doc) return null;
+  const userDoc = await User.findById(doc.userId).select({ name: 1 }).lean<LeanUserRef | null>();
+  const authorName = userDoc ? firstName(userDoc.name) : "Customer";
+  return reviewDocToDTO(doc, authorName, undefined);
+}
+
 export async function adminReplyReview(
   reviewId: string,
   adminId: string,

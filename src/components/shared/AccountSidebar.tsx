@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils/cn";
 import { signOutAction } from "@/app/(auth)/actions";
 
 const NAV = [
-  { href: "/account", label: "Profile", icon: User, exact: true },
+  { href: "/account", label: "Overview", icon: User, exact: true },
+  { href: "/account/profile", label: "Profile", icon: User, exact: false },
   { href: "/account/orders", label: "Orders", icon: Package, exact: false },
   { href: "/account/wishlist", label: "Wishlist", icon: Heart, exact: false },
   { href: "/account/addresses", label: "Addresses", icon: MapPin, exact: false },

@@ -8,6 +8,7 @@ import ImageGallery from "@/components/shop/ImageGallery";
 import PriceBlock from "@/components/shop/PriceBlock";
 import ProductGrid from "@/components/shop/ProductGrid";
 import ProductPurchasePanel from "@/components/shop/ProductPurchasePanel";
+import ProductReviews from "@/components/shop/ProductReviews";
 import { toCardDTOs } from "@/components/shop/adapters";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -268,15 +269,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<Pa
           </Tabs>
         </section>
 
-        <section id="reviews" className="mt-16 border-t border-[var(--line)] pt-10">
-          <h2 className="font-display text-3xl font-semibold tracking-[-0.02em] text-[var(--ink)]">
-            Reviews
-          </h2>
-          <p className="mt-3 text-sm text-[var(--ink-soft)]">
-            Customer reviews are coming soon. Once enough verified purchases land, you&apos;ll see
-            them here.
-          </p>
-        </section>
+        <ProductReviews productId={product.id} slug={product.slug} />
 
         {related.length > 0 ? (
           <section className="mt-20 border-t border-[var(--line)] pt-10">
