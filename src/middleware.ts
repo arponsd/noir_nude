@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/edge";
 import type { UserRole } from "@/lib/constants";
 
 // TODO(phase-1.5): wire rate-limit enforcement in route handlers once auth routes land.

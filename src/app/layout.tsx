@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Fraunces, Inter } from "next/font/google";
+import Providers from "@/components/shared/Providers";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils/cn";
 import "./globals.css";
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className={cn(fraunces.variable, inter.variable)}>
       <body className="min-h-screen bg-[var(--bg)] font-sans text-[var(--ink)] antialiased">
-        {children}
+        <Providers>{children}</Providers>
         <Toaster />
       </body>
     </html>

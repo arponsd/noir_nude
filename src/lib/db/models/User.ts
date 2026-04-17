@@ -39,6 +39,7 @@ const userSchema = new Schema(
 
     isActive: { type: Boolean, default: true },
     deletedAt: { type: Date, default: null },
+    passwordChangedAt: { type: Date },
   },
   { timestamps: true },
 );

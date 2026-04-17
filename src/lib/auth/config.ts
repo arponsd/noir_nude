@@ -9,9 +9,7 @@ import logger from "@/lib/utils/logger";
 import { loginSchema } from "@/lib/validators/auth";
 import type { UserRole } from "@/lib/constants";
 import { verifyPassword } from "./password";
-
-const isProd = env.NODE_ENV === "production";
-const SESSION_COOKIE_NAME = isProd ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+import { authConfigEdge } from "./config.edge";
 
 const googleProvider =
   env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
@@ -24,28 +22,7 @@ const googleProvider =
     : [];
 
 export const authConfig: NextAuthConfig = {
-  secret: env.NEXTAUTH_SECRET,
-  trustHost: true,
-  session: {
-    strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60,
-    updateAge: 24 * 60 * 60,
-  },
-  cookies: {
-    sessionToken: {
-      name: SESSION_COOKIE_NAME,
-      options: {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: "lax",
-        path: "/",
-      },
-    },
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
+  ...authConfigEdge,
   providers: [
     Credentials({
       name: "Credentials",
