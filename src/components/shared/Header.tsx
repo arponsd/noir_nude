@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
+import { Heart, Menu, ShoppingBag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import SearchAutocomplete from "@/components/shop/SearchAutocomplete";
 import { cn } from "@/lib/utils/cn";
 
 const NAV_ITEMS = [
@@ -69,9 +70,9 @@ export default function Header({ cartCount = 0 }: HeaderProps) {
         </nav>
 
         <div className="ml-auto flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Search">
-            <Search className="size-5" strokeWidth={1.5} />
-          </Button>
+          <div className="hidden w-64 md:block lg:w-80">
+            <SearchAutocomplete />
+          </div>
           <Link
             href="/account/wishlist"
             className={cn(
