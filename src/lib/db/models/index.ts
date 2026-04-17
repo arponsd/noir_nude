@@ -29,3 +29,6 @@ export type { CouponDoc } from "./Coupon";
 
 export { CouponRedemption } from "./CouponRedemption";
 export type { CouponRedemptionDoc } from "./CouponRedemption";
+
+export { Review, MAX_REVIEW_IMAGES } from "./Review";
+export type { ReviewDoc, ReviewImageDoc, ReviewAdminReply } from "./Review";

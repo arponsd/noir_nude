@@ -2,9 +2,16 @@ import type { ReactElement } from "react";
 import { render } from "@react-email/render";
 import { Resend } from "resend";
 import { env } from "@/lib/env";
+import { formatBDT } from "@/lib/constants";
 import logger from "@/lib/utils/logger";
 import { PasswordReset } from "@/emails/PasswordReset";
 import { VerifyEmail } from "@/emails/VerifyEmail";
+import { OrderPlacedEmail } from "@/emails/OrderPlacedEmail";
+import { OrderShippedEmail } from "@/emails/OrderShippedEmail";
+import { OrderDeliveredEmail } from "@/emails/OrderDeliveredEmail";
+import { OrderCancelledEmail } from "@/emails/OrderCancelledEmail";
+import { AccountDeletedEmail } from "@/emails/AccountDeletedEmail";
+import type { OrderDetail } from "@/types/api/order";
 
 export type SendEmailInput = {
   to: string;
@@ -98,5 +105,109 @@ export async function sendPasswordResetEmail(
     to,
     subject: "Reset your GlowCart password",
     react: PasswordReset({ resetUrl, name }),
+  });
+}
+
+/* ----------------------------------------------------------------------------
+ * Order lifecycle senders.
+ *
+ * Each helper derives display-ready strings from the Order DTO (money via formatBDT,
+ * URLs anchored to the public app origin) so the templates themselves stay presentational.
+ * When RESEND_API_KEY is missing (dev/test), `sendEmail` already falls back to a logger
+ * write — callers never need to guard.
+ * -------------------------------------------------------------------------- */
+
+function orderUrl(order: Pick<OrderDetail, "id">): string {
+  return `${appUrl()}/account/orders/${order.id}`;
+}
+
+function reviewUrlForOrder(order: Pick<OrderDetail, "id">): string {
+  return `${appUrl()}/account/orders/${order.id}/review`;
+}
+
+type OrderEmailInput = Pick<
+  OrderDetail,
+  "id" | "orderNumber" | "total" | "trackingNumber" | "courier"
+>;
+
+export async function sendOrderPlacedEmail(
+  to: string,
+  order: OrderEmailInput,
+  customerName = "there",
+): Promise<SendEmailResult> {
+  return sendEmail({
+    to,
+    subject: `Order ${order.orderNumber} confirmed`,
+    react: OrderPlacedEmail({
+      orderNumber: order.orderNumber,
+      customerName,
+      total: formatBDT(order.total),
+      orderUrl: orderUrl(order),
+    }),
+  });
+}
+
+export async function sendOrderShippedEmail(
+  to: string,
+  order: OrderEmailInput,
+  customerName = "there",
+): Promise<SendEmailResult> {
+  const props: Parameters<typeof OrderShippedEmail>[0] = {
+    orderNumber: order.orderNumber,
+    customerName,
+    orderUrl: orderUrl(order),
+  };
+  if (order.trackingNumber) props.trackingNumber = order.trackingNumber;
+  if (order.courier) props.courier = order.courier;
+  return sendEmail({
+    to,
+    subject: `Order ${order.orderNumber} has shipped`,
+    react: OrderShippedEmail(props),
+  });
+}
+
+export async function sendOrderDeliveredEmail(
+  to: string,
+  order: OrderEmailInput,
+  customerName = "there",
+): Promise<SendEmailResult> {
+  return sendEmail({
+    to,
+    subject: `Order ${order.orderNumber} delivered`,
+    react: OrderDeliveredEmail({
+      orderNumber: order.orderNumber,
+      customerName,
+      orderUrl: orderUrl(order),
+      reviewUrl: reviewUrlForOrder(order),
+    }),
+  });
+}
+
+export async function sendOrderCancelledEmail(
+  to: string,
+  order: OrderEmailInput,
+  reason: string,
+  customerName = "there",
+): Promise<SendEmailResult> {
+  return sendEmail({
+    to,
+    subject: `Order ${order.orderNumber} cancelled`,
+    react: OrderCancelledEmail({
+      orderNumber: order.orderNumber,
+      customerName,
+      reason,
+      orderUrl: orderUrl(order),
+    }),
+  });
+}
+
+export async function sendAccountDeletedEmail(
+  to: string,
+  customerName: string,
+): Promise<SendEmailResult> {
+  return sendEmail({
+    to,
+    subject: "Your GlowCart account has been deleted",
+    react: AccountDeletedEmail({ customerName: customerName || "there" }),
   });
 }

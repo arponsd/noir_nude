@@ -19,8 +19,11 @@ import {
   placeOrderForUser,
   reorderAsCart,
 } from "@/lib/services/order";
+import { sendOrderCancelledEmail, sendOrderPlacedEmail } from "@/lib/services/email";
+import { getUserById } from "@/lib/services/user";
 import type { Cart } from "@/types/api/cart";
 import type { OrderDetail } from "@/types/api/order";
+import logger from "@/lib/utils/logger";
 
 function revalidateOrderPaths(): void {
   revalidatePath("/cart");
@@ -57,6 +60,18 @@ export const placeOrderAction = safeAction(
     const parsed = placeOrderSchema.parse(input);
     const order = await placeOrderForUser(session.user.id, parsed);
     revalidateOrderPaths();
+
+    // Best-effort confirmation email. Never fail the order placement if the
+    // provider or template render rejects — the user already has a placed order.
+    try {
+      const user = await getUserById(session.user.id);
+      if (user?.email) {
+        await sendOrderPlacedEmail(user.email, order, user.name ?? "there");
+      }
+    } catch (err) {
+      logger.warn({ err, orderId: order.id }, "order-placed email failed");
+    }
+
     return { orderNumber: order.orderNumber, orderId: order.id };
   },
 );
@@ -80,6 +95,16 @@ export const cancelOrderAction = safeAction(
     const order = await cancelOrder(session.user.id, orderId, reason);
     revalidateOrderPaths();
     revalidatePath(`/account/orders/${orderId}`);
+
+    try {
+      const user = await getUserById(session.user.id);
+      if (user?.email) {
+        await sendOrderCancelledEmail(user.email, order, reason, user.name ?? "there");
+      }
+    } catch (err) {
+      logger.warn({ err, orderId }, "order-cancelled email failed");
+    }
+
     return order;
   },
 );
