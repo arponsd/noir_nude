@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  getFeaturedProducts as dbGetFeaturedProducts,
   getProductBySlug as dbGetProductBySlug,
   getRelatedProducts as dbGetRelatedProducts,
   listProducts as dbListProducts,
@@ -144,5 +145,10 @@ export async function getProductDetailService(slug: string): Promise<ProductDeta
 
 export async function getRelatedProductsService(slug: string, limit = 8): Promise<ProductCard[]> {
   const docs = await dbGetRelatedProducts(slug, limit);
+  return docs.map(cardFromDTO);
+}
+
+export async function getFeaturedProductsService(limit = 8): Promise<ProductCard[]> {
+  const docs = await dbGetFeaturedProducts(limit);
   return docs.map(cardFromDTO);
 }
