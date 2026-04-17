@@ -1,0 +1,63 @@
+# CODEOWNERS — auto-assigns reviewers by path.
+# Mirrors docs/03-file-ownership.md.
+# Replace the @handles below with real GitHub usernames or team slugs.
+
+# Fallback: orchestrator reviews anything not otherwise claimed
+*                                     @orchestrator
+
+# Frontend lane
+/src/app/(shop)/**                    @agent-frontend
+/src/app/(auth)/**                    @agent-frontend @agent-security
+/src/app/admin/**                     @agent-frontend @agent-backend
+/src/app/layout.tsx                   @agent-frontend @agent-security
+/src/app/globals.css                  @agent-frontend
+/src/components/**                    @agent-frontend
+/src/hooks/**                         @agent-frontend
+/src/emails/**                        @agent-frontend @agent-backend
+/src/lib/analytics/**                 @agent-frontend
+/public/**                            @agent-frontend
+/tailwind.config.ts                   @agent-frontend
+
+# Backend lane
+/src/app/api/**                       @agent-backend
+/src/app/api/auth/**                  @agent-security
+/src/lib/actions/**                   @agent-backend
+/src/lib/services/**                  @agent-backend
+/src/lib/validators/**                @agent-backend
+/src/lib/validators/auth.ts           @agent-security
+/src/lib/constants.ts                 @agent-backend @agent-frontend @agent-database @agent-security @agent-devops @agent-qa
+/src/types/**                         @agent-backend @agent-frontend @agent-database
+
+# Database lane
+/src/lib/db/**                        @agent-database
+/scripts/seed/**                      @agent-database
+/scripts/migrate/**                   @agent-database
+
+# Security lane
+/src/lib/auth/**                      @agent-security
+/src/lib/rate-limit/**                @agent-security
+/src/lib/csrf/**                      @agent-security
+/src/middleware.ts                    @agent-security
+
+# DevOps lane
+/.github/**                           @agent-devops
+/.husky/**                            @agent-devops
+/next.config.ts                       @agent-devops
+/instrumentation.ts                   @agent-devops
+/vercel.json                          @agent-devops
+/.env.example                         @agent-devops
+/commitlint.config.cjs                @agent-devops
+/.lintstagedrc.json                   @agent-devops
+/package.json                         @agent-devops @agent-frontend @agent-backend @agent-database @agent-security @agent-qa
+/tsconfig.json                        @agent-devops @agent-frontend @agent-backend
+
+# QA lane
+/tests/**                             @agent-qa
+/playwright.config.ts                 @agent-qa
+/vitest.config.ts                     @agent-qa
+
+# Docs — orchestrator owns the folder; contracts.md is extra-locked
+/docs/**                              @orchestrator
+/docs/04-contracts.md                 @orchestrator
+/documents/**                         @orchestrator
+/CLAUDE.md                            @orchestrator

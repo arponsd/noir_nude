@@ -1,0 +1,89 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+.vercel/
+
+# Production
+build/
+dist/
+
+# Environment
+.env
+.env*.local
+.env.development
+.env.production
+.env.staging
+# allow the example to be committed
+!.env.example
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# Debug
+.claude-worklog
+WORKLOG.md
+.worklog/
+
+# TypeScript incremental
+*.tsbuildinfo
+
+# Sentry
+.sentryclirc
+
+# Cloudinary upload cache (if any local)
+.cloudinary-cache/
+
+# Generated
+/public/sitemap*.xml
+/public/robots.txt
+
+# Lock files from wrong package managers
+package-lock.json
+yarn.lock
+
+# Local DB dumps
+*.dump
+*.bson
+/dumps/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Misc
+.cache/
+.turbo/

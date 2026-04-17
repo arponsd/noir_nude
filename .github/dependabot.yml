@@ -1,0 +1,90 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: "Asia/Dhaka"
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - chore
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    groups:
+      next:
+        patterns:
+          - "next"
+          - "@next/*"
+          - "eslint-config-next"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "tailwind-*"
+      shadcn-radix:
+        patterns:
+          - "@radix-ui/*"
+      forms:
+        patterns:
+          - "react-hook-form"
+          - "@hookform/*"
+          - "zod"
+      data:
+        patterns:
+          - "@tanstack/*"
+          - "zustand"
+      db:
+        patterns:
+          - "mongoose"
+          - "mongodb"
+      auth:
+        patterns:
+          - "next-auth"
+          - "@auth/*"
+          - "bcryptjs"
+      mail:
+        patterns:
+          - "resend"
+          - "@react-email/*"
+      sentry:
+        patterns:
+          - "@sentry/*"
+      testing:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "@playwright/*"
+          - "playwright"
+          - "@testing-library/*"
+      lint-format:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "prettier*"
+          - "husky"
+          - "lint-staged"
+          - "commitlint"
+          - "@commitlint/*"
+    ignore:
+      - dependency-name: "node"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels:
+      - ci
+      - chore
+    commit-message:
+      prefix: "ci"
+      include: "scope"

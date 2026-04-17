@@ -1,0 +1,17 @@
+# <type>(<scope>): <subject>  <-- ≤72 chars, imperative, no trailing period
+#
+# Types:    feat, fix, refactor, perf, test, docs, chore, build, ci, style, revert
+# Scopes:   frontend/<area>, backend/<area>, database/<area>, security/<area>,
+#           devops/<area>, qa/<area>, docs, contracts, types, repo
+#
+# Body: wrap at 72, explain *why* (the diff shows *what*). Blank line between subject and body.
+#
+# Footer: "BREAKING CHANGE: <explain>", "Refs #123", "Closes #123", "Co-Authored-By: <name> <email>"
+#
+# Examples:
+#   feat(frontend/pdp): shade selector with swatch previews
+#   fix(backend/cart): validate coupon against current cart items
+#   chore(devops/ci): cache pnpm store between runs
+#   feat(backend/order)!: rename orderStatus `confirmed` → `placed`
+#
+# Rules enforced by commitlint — hook will reject non-conforming messages.
