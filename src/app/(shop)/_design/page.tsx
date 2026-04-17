@@ -36,6 +36,19 @@ import VariantSwatches from "@/components/shop/VariantSwatches";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import DesignPrimitivesClient from "./DesignPrimitivesClient";
 import DesignCommerceClient from "./DesignCommerceClient";
+import DesignAdminClient from "./DesignAdminClient";
+import StatCard from "@/components/admin/dashboard/StatCard";
+import MiniChart from "@/components/admin/dashboard/MiniChart";
+import SalesChart from "@/components/admin/dashboard/SalesChart";
+import TopProductsList from "@/components/admin/dashboard/TopProductsList";
+import LowStockList from "@/components/admin/dashboard/LowStockList";
+import AdminOrdersTable from "@/components/admin/orders/AdminOrdersTable";
+import InventoryTable from "@/components/admin/inventory/InventoryTable";
+import CouponsTable from "@/components/admin/coupons/CouponsTable";
+import BannersGrid from "@/components/admin/banners/BannersGrid";
+import CustomersTable from "@/components/admin/customers/CustomersTable";
+import SalesReportView from "@/components/admin/reports/SalesReportView";
+import RoleBadge from "@/components/admin/roles/RoleBadge";
 
 export const metadata = {
   title: "Design system",
@@ -316,6 +329,253 @@ export default function DesignSystemPage() {
 
       <Section title="Commerce primitives">
         <DesignCommerceClient />
+      </Section>
+
+      <Section title="Admin — placeholder preview (admin role only)">
+        <p className="mb-6 text-xs text-[var(--muted)]">
+          These primitives are rendered here with placeholder data. The real admin routes are gated
+          to the admin/manager/support roles.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label="Orders (7d)" value="128" delta={8.4} footnote="vs. previous 7d" />
+          <StatCard label="Revenue (7d)" value="৳ 1,248,500.00" delta={-2.1} />
+          <StatCard label="New customers" value="34" delta={12.0} />
+          <StatCard label="AOV" value="৳ 2,430.00" />
+        </div>
+
+        <div className="mt-6 flex items-center gap-4 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface)] p-4">
+          <span className="text-xs text-[var(--muted)]">Last 14 days</span>
+          <MiniChart
+            data={[3, 5, 4, 6, 8, 7, 10, 9, 12, 11, 14, 13, 15, 16].map((y, i) => ({
+              x: String(i),
+              y,
+            }))}
+            className="h-10 w-32"
+          />
+        </div>
+
+        <div className="mt-6">
+          <SalesChart
+            buckets={[
+              { label: "Mon", revenue: 180_000, orders: 14 },
+              { label: "Tue", revenue: 220_000, orders: 18 },
+              { label: "Wed", revenue: 260_000, orders: 22 },
+              { label: "Thu", revenue: 200_000, orders: 17 },
+              { label: "Fri", revenue: 340_000, orders: 28 },
+              { label: "Sat", revenue: 410_000, orders: 33 },
+              { label: "Sun", revenue: 300_000, orders: 25 },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <TopProductsList
+            products={[
+              {
+                id: "p1",
+                slug: "hydrating-serum",
+                name: "Hydrating hyaluronic serum",
+                unitsSold: 142,
+                revenue: 21_285_800,
+              },
+              {
+                id: "p2",
+                slug: "matte-lipstick",
+                name: "Velvet matte lipstick",
+                unitsSold: 98,
+                revenue: 8_810_200,
+              },
+              {
+                id: "p3",
+                slug: "cream-blush",
+                name: "Silk cream blush",
+                unitsSold: 61,
+                revenue: 7_311_900,
+              },
+            ]}
+          />
+          <LowStockList
+            items={[
+              {
+                productId: "p1",
+                productSlug: "hydrating-serum",
+                productName: "Hydrating hyaluronic serum",
+                variantId: "v1",
+                variantName: "30ml",
+                sku: "HYD-30",
+                stock: 0,
+              },
+              {
+                productId: "p2",
+                productSlug: "matte-lipstick",
+                productName: "Velvet matte lipstick",
+                variantId: "v2",
+                variantName: "Rose",
+                sku: "LIP-RS",
+                stock: 3,
+              },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6">
+          <AdminOrdersTable
+            orders={[
+              {
+                id: "o1",
+                orderNumber: "A-2134",
+                placedAt: new Date().toISOString(),
+                orderStatus: "shipped",
+                paymentStatus: "pending",
+                total: 2_499_00,
+                itemCount: 3,
+                customerName: "Fatima Rahman",
+                customerEmail: "fatima@example.com",
+              },
+              {
+                id: "o2",
+                orderNumber: "A-2135",
+                placedAt: new Date(Date.now() - 86400000).toISOString(),
+                orderStatus: "placed",
+                paymentStatus: "pending",
+                total: 1_299_00,
+                itemCount: 1,
+                customerName: "Anik Das",
+                customerEmail: "anik@example.com",
+              },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6">
+          <InventoryTable
+            rows={[
+              {
+                productId: "p1",
+                productSlug: "hydrating-serum",
+                productName: "Hydrating hyaluronic serum",
+                variantId: "v1",
+                variantName: "30ml",
+                sku: "HYD-30",
+                stock: 0,
+                reservedStock: 0,
+              },
+              {
+                productId: "p2",
+                productSlug: "matte-lipstick",
+                productName: "Velvet matte lipstick",
+                variantId: "v2",
+                variantName: "Rose",
+                sku: "LIP-RS",
+                stock: 3,
+                reservedStock: 1,
+              },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6">
+          <CouponsTable
+            coupons={[
+              {
+                id: "c1",
+                code: "SPRING25",
+                type: "percent",
+                value: 25,
+                usageCount: 42,
+                usageLimit: 500,
+                validFrom: new Date(Date.now() - 86400000 * 3).toISOString(),
+                validUntil: new Date(Date.now() + 86400000 * 21).toISOString(),
+                isActive: true,
+              },
+              {
+                id: "c2",
+                code: "FREESHIP",
+                type: "free_shipping",
+                value: 0,
+                usageCount: 11,
+                validFrom: new Date().toISOString(),
+                validUntil: new Date(Date.now() + 86400000 * 7).toISOString(),
+                isActive: true,
+              },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6">
+          <BannersGrid
+            banners={[
+              {
+                id: "b1",
+                title: "Spring arrivals",
+                subtitle: "Dewy skin essentials",
+                imageUrl:
+                  "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=80",
+                href: "/shop",
+                cta: "Shop now",
+                order: 0,
+                isActive: true,
+              },
+              {
+                id: "b2",
+                title: "Matte moment",
+                imageUrl:
+                  "https://images.unsplash.com/photo-1522335789203-aaa741b58c4d?auto=format&fit=crop&w=1200&q=80",
+                order: 1,
+                isActive: false,
+              },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6">
+          <CustomersTable
+            customers={[
+              {
+                id: "u1",
+                name: "Fatima Rahman",
+                email: "fatima@example.com",
+                totalOrders: 7,
+                totalSpent: 18_450_00,
+                lastOrderAt: new Date().toISOString(),
+              },
+              {
+                id: "u2",
+                name: "Anik Das",
+                email: "anik@example.com",
+                totalOrders: 2,
+                totalSpent: 2_998_00,
+                lastOrderAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+              },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6">
+          <SalesReportView
+            buckets={[
+              { label: "Mon", revenue: 180_000, orders: 14 },
+              { label: "Tue", revenue: 220_000, orders: 18 },
+              { label: "Wed", revenue: 260_000, orders: 22 },
+              { label: "Thu", revenue: 200_000, orders: 17 },
+              { label: "Fri", revenue: 340_000, orders: 28 },
+              { label: "Sat", revenue: 410_000, orders: 33 },
+              { label: "Sun", revenue: 300_000, orders: 25 },
+            ]}
+          />
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <RoleBadge role="customer" />
+          <RoleBadge role="admin" />
+          <RoleBadge role="manager" />
+          <RoleBadge role="support" />
+        </div>
+
+        <div className="mt-8">
+          <DesignAdminClient />
+        </div>
       </Section>
 
       <Section title="Overlays">

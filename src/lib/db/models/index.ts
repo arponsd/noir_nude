@@ -32,3 +32,9 @@ export type { CouponRedemptionDoc } from "./CouponRedemption";
 
 export { Review, MAX_REVIEW_IMAGES } from "./Review";
 export type { ReviewDoc, ReviewImageDoc, ReviewAdminReply } from "./Review";
+
+export { Banner } from "./Banner";
+export type { BannerDoc } from "./Banner";
+
+export { ActivityLog, ACTIVITY_ENTITIES, createActivityLog } from "./ActivityLog";
+export type { ActivityLogDoc, ActivityEntity, CreateActivityLogInput } from "./ActivityLog";

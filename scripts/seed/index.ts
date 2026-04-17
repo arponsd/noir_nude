@@ -4,6 +4,7 @@ import { seedCategories } from "./categories.js";
 import { seedProducts } from "./products.js";
 import { seedCoupons } from "./coupons.js";
 import { seedReviews } from "./reviews.js";
+import { seedBanners } from "./banners.js";
 
 type SeedResult = { created: number; skipped: number };
 
@@ -25,6 +26,9 @@ async function main(): Promise<void> {
   console.log("[seed] seeding products…");
   const products = await seedProducts();
 
+  console.log("[seed] seeding banners…");
+  const banners = await seedBanners();
+
   console.log("[seed] seeding coupons…");
   const coupons = await seedCoupons();
 
@@ -36,6 +40,7 @@ async function main(): Promise<void> {
   console.log(line("users", users));
   console.log(line("categories", categories));
   console.log(line("products", products));
+  console.log(line("banners", banners));
   console.log(line("coupons", coupons));
   console.log(line("reviews", reviews));
   console.log(`[seed] done in ${elapsed}ms`);
