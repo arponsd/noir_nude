@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import {
   Activity,
   BarChart3,
+  Boxes,
   Image as ImageIcon,
   LayoutDashboard,
   LogOut,
   Package,
   Ribbon,
+  ShieldCheck,
   ShoppingBag,
   Star,
   Users,
@@ -18,15 +20,17 @@ import { cn } from "@/lib/utils/cn";
 import { signOutAction } from "@/app/(auth)/actions";
 
 const NAV = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: false },
   { href: "/admin/products", label: "Products", icon: Package, exact: false },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag, exact: false },
-  { href: "/admin/customers", label: "Customers", icon: Users, exact: false },
+  { href: "/admin/inventory", label: "Inventory", icon: Boxes, exact: false },
   { href: "/admin/coupons", label: "Coupons", icon: Ribbon, exact: false },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon, exact: false },
+  { href: "/admin/customers", label: "Customers", icon: Users, exact: false },
   { href: "/admin/reviews", label: "Reviews", icon: Star, exact: false },
   { href: "/admin/reports", label: "Reports", icon: BarChart3, exact: false },
   { href: "/admin/activity", label: "Activity", icon: Activity, exact: false },
+  { href: "/admin/roles", label: "Roles", icon: ShieldCheck, exact: false },
 ] as const;
 
 export default function AdminSidebar() {

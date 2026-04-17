@@ -55,15 +55,12 @@ export async function listLowStockVariants(
   threshold = 5,
   limit = 50,
 ): Promise<LowStockVariantRow[]> {
+  // reason: $expr cannot be nested inside $elemMatch on a subdoc array — fetch any
+  // product with an active variant and filter available (stock - reservedStock) in JS.
   const docs = await Product.find({
     isActive: true,
     deletedAt: null,
-    variants: {
-      $elemMatch: {
-        isActive: true,
-        $expr: { $lt: [{ $subtract: ["$stock", "$reservedStock"] }, threshold] },
-      },
-    },
+    "variants.isActive": true,
   })
     .select({ slug: 1, name: 1, variants: 1 })
     .lean<LeanLowStockProduct[]>();

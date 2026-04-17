@@ -3,8 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-// TODO(backend): reconcile with `@/lib/actions/admin-order` once implemented.
-// import { adminUpdateOrderStatusAction } from "@/lib/actions/admin-order";
+import { adminUpdateOrderStatusAction } from "@/lib/actions/admin-order";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,36 +16,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ORDER_TRANSITIONS, type OrderStatus } from "@/lib/constants";
-
-// TODO(backend): import real action signature from `@/lib/actions/admin-order`.
-type AdminUpdateOrderStatusInput = {
-  orderId: string;
-  status: OrderStatus;
-  note?: string;
-  trackingNumber?: string;
-  courier?: string;
-};
-type AdminUpdateOrderStatusResult =
-  | { ok: true; data: { id: string; orderStatus: OrderStatus } }
-  | { ok: false; error: { code: string; message: string } };
-
-// Local placeholder — orchestrator reconciles once backend lane lands the action.
-async function adminUpdateOrderStatusAction(
-  input: AdminUpdateOrderStatusInput,
-): Promise<AdminUpdateOrderStatusResult> {
-  const res = await fetch(`/api/admin/orders/${input.orderId}/status`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      status: input.status,
-      ...(input.note ? { note: input.note } : {}),
-      ...(input.trackingNumber ? { trackingNumber: input.trackingNumber } : {}),
-      ...(input.courier ? { courier: input.courier } : {}),
-    }),
-    credentials: "same-origin",
-  });
-  return (await res.json()) as AdminUpdateOrderStatusResult;
-}
 
 export interface AdminOrderStatusFormProps {
   orderId: string;

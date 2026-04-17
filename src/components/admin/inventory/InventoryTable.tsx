@@ -105,7 +105,11 @@ export default function InventoryTable({ rows, className }: InventoryTableProps)
                     {r.reservedStock}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <AdjustStockCell variantId={r.variantId} currentStock={r.stock} />
+                    <AdjustStockCell
+                      productId={r.productId}
+                      variantId={r.variantId}
+                      currentStock={r.stock}
+                    />
                   </td>
                 </tr>
               );

@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Pencil } from "lucide-react";
+import { adminReorderBannersAction } from "@/lib/actions/admin-banner";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
@@ -22,21 +22,10 @@ export interface AdminBannerRow {
   isActive: boolean;
 }
 
-// TODO(backend): replace with real action import.
-async function reorderBannersAction(input: { order: string[] }) {
-  const res = await fetch("/api/admin/banners/reorder", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-    credentials: "same-origin",
-  });
-  return (await res.json()) as
-    | { ok: true; data: { order: string[] } }
-    | { ok: false; error: { code: string; message: string } };
-}
-
 export interface BannersGridProps {
   banners: AdminBannerRow[];
+  /** Invoked when the user clicks the Edit affordance on a card. */
+  onEdit?: (banner: AdminBannerRow) => void;
   className?: string;
 }
 
@@ -59,7 +48,7 @@ function publishState(b: AdminBannerRow): { label: string; tone: "ok" | "muted" 
  * but each card is static aside from the two arrow buttons. Reordering sends the full
  * ordered id list to the backend so the server stores absolute positions.
  */
-export default function BannersGrid({ banners, className }: BannersGridProps) {
+export default function BannersGrid({ banners, onEdit, className }: BannersGridProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [busy, setBusy] = React.useState<string | null>(null);
@@ -75,7 +64,9 @@ export default function BannersGrid({ banners, className }: BannersGridProps) {
     reordered.splice(next, 0, item!);
     setBusy(id);
     try {
-      const result = await reorderBannersAction({ order: reordered.map((b) => b.id) });
+      // Submit absolute positions — server trusts the payload order.
+      const items = reordered.map((b, i) => ({ id: b.id, order: i }));
+      const result = await adminReorderBannersAction({ items });
       if (!result.ok) {
         toast({
           title: "Reorder failed",
@@ -162,13 +153,16 @@ export default function BannersGrid({ banners, className }: BannersGridProps) {
                     <ArrowDown className="size-4" strokeWidth={1.5} aria-hidden />
                   </Button>
                 </div>
-                <Link
-                  href={`/admin/banners/${b.id}`}
-                  className="inline-flex items-center gap-1 text-xs text-[var(--accent)] hover:underline"
-                >
-                  <Pencil className="size-3.5" strokeWidth={1.5} aria-hidden />
-                  Edit
-                </Link>
+                {onEdit ? (
+                  <button
+                    type="button"
+                    onClick={() => onEdit(b)}
+                    className="inline-flex items-center gap-1 text-xs text-[var(--accent)] hover:underline focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:outline-none"
+                  >
+                    <Pencil className="size-3.5" strokeWidth={1.5} aria-hidden />
+                    Edit
+                  </button>
+                ) : null}
               </div>
             </div>
           </li>

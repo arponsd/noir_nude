@@ -6,6 +6,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
+import { adminCreateCouponAction, adminUpdateCouponAction } from "@/lib/actions/admin-coupon";
 import ChipInput from "@/components/admin/ChipInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,49 +119,51 @@ export default function CouponForm({ mode, couponId, initial, categoryOptions }:
   }, [watchedType, watchedValue]);
 
   const onSubmit: SubmitHandler<CouponFormValues> = async (data) => {
-    // TODO(backend): swap to adminUpsertCouponAction once available.
-    const payload: Record<string, unknown> = {
-      code: data.code.trim().toUpperCase(),
-      type: data.type,
+    // UI uses legacy {percent,flat} names; backend validator uses {percentage,fixed}.
+    // Map at the boundary so both sides keep their idiomatic vocabulary.
+    const backendType: "percentage" | "fixed" | "free_shipping" =
+      data.type === "percent" ? "percentage" : data.type === "flat" ? "fixed" : "free_shipping";
+
+    const code = data.code.trim().toUpperCase();
+    const base: Record<string, unknown> = {
+      code,
+      type: backendType,
       value: data.type === "free_shipping" ? 0 : Number(data.value),
-      validFrom: data.validFrom,
-      validUntil: data.validUntil,
+      validFrom: new Date(data.validFrom).toISOString(),
+      validUntil: new Date(data.validUntil).toISOString(),
       applicableCategories: data.applicableCategories,
       applicableProducts: data.applicableProducts,
       isActive: data.isActive,
     };
     if (data.minOrderAmount !== "" && data.minOrderAmount !== undefined)
-      payload.minOrderAmount = Number(data.minOrderAmount);
+      base.minOrderAmount = Number(data.minOrderAmount);
     if (data.maxDiscount !== "" && data.maxDiscount !== undefined)
-      payload.maxDiscount = Number(data.maxDiscount);
+      base.maxDiscount = Number(data.maxDiscount);
     if (data.usageLimit !== "" && data.usageLimit !== undefined)
-      payload.usageLimit = Number(data.usageLimit);
+      base.usageLimit = Number(data.usageLimit);
     if (data.perUserLimit !== "" && data.perUserLimit !== undefined)
-      payload.perUserLimit = Number(data.perUserLimit);
+      base.perUserLimit = Number(data.perUserLimit);
 
-    const url = mode === "create" ? "/api/admin/coupons" : `/api/admin/coupons/${couponId}`;
-    const method = mode === "create" ? "POST" : "PATCH";
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "same-origin",
-      });
-      const json = (await res.json()) as
-        | { ok: true; data: { id: string } }
-        | { ok: false; error: { code: string; message: string } };
-      if (!json.ok) {
+      const result =
+        mode === "create"
+          ? // reason: validators enforce shape; cast to keep the payload builder flexible.
+            await adminCreateCouponAction(base as Parameters<typeof adminCreateCouponAction>[0])
+          : await adminUpdateCouponAction({
+              couponId: couponId ?? "",
+              ...(base as Omit<Parameters<typeof adminUpdateCouponAction>[0], "couponId">),
+            });
+      if (!result.ok) {
         toast({
           title: "Save failed",
-          description: json.error.message,
+          description: result.error.message,
           variant: "destructive",
         });
         return;
       }
       toast({
         title: mode === "create" ? "Coupon created" : "Coupon updated",
-        description: payload.code as string,
+        description: code,
       });
       router.push("/admin/coupons");
       router.refresh();

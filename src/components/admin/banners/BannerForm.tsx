@@ -6,6 +6,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
+import { adminCreateBannerAction, adminUpdateBannerAction } from "@/lib/actions/admin-banner";
 import CloudinaryUploader, { type UploadedImage } from "@/components/admin/CloudinaryUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,8 @@ export interface BannerFormProps {
   mode: "create" | "edit";
   bannerId?: string;
   initial?: Partial<BannerFormValues>;
+  /** Invoked after a successful save. Lets dialog parents close themselves. */
+  onSuccess?: () => void;
 }
 
 const defaultsFor = (initial?: Partial<BannerFormValues>): BannerFormValues => ({
@@ -49,7 +52,7 @@ const defaultsFor = (initial?: Partial<BannerFormValues>): BannerFormValues => (
  * Banner create/edit form. Reuses CloudinaryUploader in single-image mode
  * (the first uploaded image becomes `imageUrl`; extras are ignored).
  */
-export default function BannerForm({ mode, bannerId, initial }: BannerFormProps) {
+export default function BannerForm({ mode, bannerId, initial, onSuccess }: BannerFormProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -78,34 +81,30 @@ export default function BannerForm({ mode, bannerId, initial }: BannerFormProps)
   };
 
   const onSubmit: SubmitHandler<BannerFormValues> = async (data) => {
-    const payload: Record<string, unknown> = {
+    const base: Record<string, unknown> = {
       imageUrl: data.imageUrl,
       title: data.title,
       order: data.order,
       isActive: data.isActive,
     };
-    if (data.subtitle) payload.subtitle = data.subtitle;
-    if (data.href) payload.href = data.href;
-    if (data.cta) payload.cta = data.cta;
-    if (data.publishFrom) payload.publishFrom = data.publishFrom;
-    if (data.publishUntil) payload.publishUntil = data.publishUntil;
+    if (data.subtitle) base.subtitle = data.subtitle;
+    if (data.href) base.href = data.href;
+    if (data.cta) base.cta = data.cta;
+    if (data.publishFrom) base.publishFrom = new Date(data.publishFrom).toISOString();
+    if (data.publishUntil) base.publishUntil = new Date(data.publishUntil).toISOString();
 
-    const url = mode === "create" ? "/api/admin/banners" : `/api/admin/banners/${bannerId}`;
-    const method = mode === "create" ? "POST" : "PATCH";
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "same-origin",
-      });
-      const json = (await res.json()) as
-        | { ok: true; data: { id: string } }
-        | { ok: false; error: { code: string; message: string } };
-      if (!json.ok) {
+      const result =
+        mode === "create"
+          ? await adminCreateBannerAction(base as Parameters<typeof adminCreateBannerAction>[0])
+          : await adminUpdateBannerAction({
+              bannerId: bannerId ?? "",
+              ...(base as Omit<Parameters<typeof adminUpdateBannerAction>[0], "bannerId">),
+            });
+      if (!result.ok) {
         toast({
           title: "Save failed",
-          description: json.error.message,
+          description: result.error.message,
           variant: "destructive",
         });
         return;
@@ -114,7 +113,7 @@ export default function BannerForm({ mode, bannerId, initial }: BannerFormProps)
         title: mode === "create" ? "Banner created" : "Banner updated",
         description: data.title,
       });
-      router.push("/admin/banners");
+      if (onSuccess) onSuccess();
       router.refresh();
     } catch (err) {
       toast({

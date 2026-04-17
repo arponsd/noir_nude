@@ -3,34 +3,15 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Minus, Plus } from "lucide-react";
+import { adjustInventoryAction } from "@/lib/actions/admin-inventory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/cn";
 
-// TODO(backend): replace with real server action import from `@/lib/actions/admin`.
-// import { adjustInventoryAction } from "@/lib/actions/admin";
-type AdjustInventoryInput = {
-  variantId: string;
-  delta: number;
-  reason: string;
-};
-type AdjustInventoryResult =
-  | { ok: true; data: { variantId: string; stock: number } }
-  | { ok: false; error: { code: string; message: string } };
-
-async function adjustInventoryAction(input: AdjustInventoryInput): Promise<AdjustInventoryResult> {
-  const res = await fetch(`/api/admin/inventory/${input.variantId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ delta: input.delta, reason: input.reason }),
-    credentials: "same-origin",
-  });
-  return (await res.json()) as AdjustInventoryResult;
-}
-
 export interface AdjustStockCellProps {
+  productId: string;
   variantId: string;
   currentStock: number;
   className?: string;
@@ -42,6 +23,7 @@ export interface AdjustStockCellProps {
  * placeholder `adjustInventoryAction`.
  */
 export default function AdjustStockCell({
+  productId,
   variantId,
   currentStock,
   className,
@@ -59,6 +41,7 @@ export default function AdjustStockCell({
     setSubmitting(true);
     try {
       const result = await adjustInventoryAction({
+        productId,
         variantId,
         delta,
         reason: reason.trim(),
