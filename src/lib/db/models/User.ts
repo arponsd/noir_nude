@@ -44,7 +44,8 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-userSchema.index({ email: 1 }, { unique: true });
+// reason: email already has field-level `unique: true` — redeclaring here would trigger
+// Mongoose duplicate-index warnings at model compile time.
 userSchema.index({ referralCode: 1 }, { unique: true, sparse: true });
 userSchema.index({ role: 1 });
 

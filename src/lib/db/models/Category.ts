@@ -43,7 +43,7 @@ const categorySchema = new Schema(
   { timestamps: true },
 );
 
-categorySchema.index({ slug: 1 }, { unique: true });
+// reason: slug already has field-level `unique: true` — avoid duplicate-index warning
 categorySchema.index({ parentId: 1 });
 
 categorySchema.pre("validate", function (next) {

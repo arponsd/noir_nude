@@ -71,6 +71,16 @@ export const USER_ROLES = ["customer", "admin", "manager", "support"] as const;
 
 export type UserRole = (typeof USER_ROLES)[number];
 
+/**
+ * Commerce constants (integer paisa).
+ *
+ * Free shipping kicks in once cart subtotal (post-discount) meets this threshold.
+ * 2000 BDT = 200_000 paisa.
+ */
+export const FREE_SHIPPING_THRESHOLD = 200_000;
+/** 50 BDT = 5_000 paisa — default flat shipping fee when below threshold. */
+export const DEFAULT_SHIPPING_FEE = 5_000;
+
 export const BADGES = [
   "new",
   "bestseller",

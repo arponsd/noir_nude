@@ -2,6 +2,7 @@ import { connectDb, disconnectDb } from "../../src/lib/db/connect.js";
 import { seedAdminUsers } from "./users.js";
 import { seedCategories } from "./categories.js";
 import { seedProducts } from "./products.js";
+import { seedCoupons } from "./coupons.js";
 
 type SeedResult = { created: number; skipped: number };
 
@@ -23,11 +24,15 @@ async function main(): Promise<void> {
   console.log("[seed] seeding products…");
   const products = await seedProducts();
 
+  console.log("[seed] seeding coupons…");
+  const coupons = await seedCoupons();
+
   const elapsed = Date.now() - start;
   console.log("\n[seed] summary:");
   console.log(line("users", users));
   console.log(line("categories", categories));
   console.log(line("products", products));
+  console.log(line("coupons", coupons));
   console.log(`[seed] done in ${elapsed}ms`);
 }
 

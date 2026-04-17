@@ -35,6 +35,7 @@ import ProductSkeleton from "@/components/shop/ProductSkeleton";
 import VariantSwatches from "@/components/shop/VariantSwatches";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import DesignPrimitivesClient from "./DesignPrimitivesClient";
+import DesignCommerceClient from "./DesignCommerceClient";
 
 export const metadata = {
   title: "Design system",
@@ -311,6 +312,10 @@ export default function DesignSystemPage() {
 
       <Section title="Interactive primitives">
         <DesignPrimitivesClient />
+      </Section>
+
+      <Section title="Commerce primitives">
+        <DesignCommerceClient />
       </Section>
 
       <Section title="Overlays">

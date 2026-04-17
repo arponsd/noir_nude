@@ -95,7 +95,7 @@ const productSchema = new Schema(
   { timestamps: true },
 );
 
-productSchema.index({ slug: 1 }, { unique: true });
+// reason: slug already has field-level `unique: true` — omit the redundant compound decl
 productSchema.index({ categoryId: 1 });
 productSchema.index({ tags: 1 });
 productSchema.index(
