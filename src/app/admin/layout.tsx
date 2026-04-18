@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import SkipToContent from "@/components/shared/SkipToContent";
 import { auth } from "@/lib/auth";
 
 const ADMIN_ROLES = new Set(["admin", "manager", "support"]);
@@ -13,6 +14,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="flex min-h-screen bg-[var(--bg)]">
+      <SkipToContent />
       <aside className="flex w-60 flex-col border-r border-[var(--line)] bg-[var(--surface)]">
         <div className="flex h-16 items-center border-b border-[var(--line)] px-5">
           <Link
@@ -37,7 +39,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             {session.user.role}
           </span>
         </header>
-        <main className="flex-1 px-6 py-8">{children}</main>
+        <main id="content" className="flex-1 px-6 py-8">
+          {children}
+        </main>
       </div>
     </div>
   );

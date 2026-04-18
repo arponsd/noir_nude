@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ok, safeRoute } from "@/lib/api/response";
 import { authLimiter, checkLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/rate-limit/client-ip";
 import { forgotPasswordSchema } from "@/lib/validators/auth";
 import { getUserByEmail } from "@/lib/services/user";
 import { createPasswordResetToken } from "@/lib/auth/tokens";
@@ -8,13 +9,8 @@ import { sendPasswordResetEmail } from "@/lib/services/email";
 import { connectDb } from "@/lib/db/connect";
 import logger from "@/lib/utils/logger";
 
-function clientIp(req: Request): string {
-  const header = req.headers.get("x-forwarded-for");
-  return header?.split(",")[0]?.trim() || "unknown";
-}
-
 export const POST = safeRoute(async (req: Request) => {
-  await checkLimit(authLimiter, `forgot:${clientIp(req)}`);
+  await checkLimit(authLimiter, `forgot:${getClientIp(req)}`);
   await connectDb();
 
   const raw: unknown = await req.json().catch(() => ({}));

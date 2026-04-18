@@ -86,6 +86,15 @@ export const orderLimiter = buildLimiter(10, "h", "order");
 export const reviewLimiter = buildLimiter(3, "h", "review");
 export const cartLimiter = buildLimiter(30, "m", "cart");
 export const searchLimiter = buildLimiter(60, "m", "search");
+// reason(T-7.S02): profile/account write endpoints need a looser bucket than
+//   the 5/min auth limiter (which is calibrated for login/register brute-force)
+//   but tighter than cart. 30/min/user matches the documented pattern and
+//   covers preference toggles that might burst while a user edits a form.
+export const profileLimiter = buildLimiter(30, "m", "profile");
+// reason(T-7.S02): address CRUD is interactive UI — users frequently add,
+//   toggle default, and remove addresses in a single session; 60/min/user
+//   keeps the throttle invisible to humans while still blocking scripted abuse.
+export const addressLimiter = buildLimiter(60, "m", "address");
 
 export async function checkLimit(limiter: LimiterLike, key: string): Promise<LimitResult> {
   const result = await limiter.limit(key);

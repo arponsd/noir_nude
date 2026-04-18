@@ -1,8 +1,10 @@
 // e2e: tag=account
-// TODO(security): enforce x-csrf-token double-submit once middleware is wired into /api/**.
+// CSRF: enforcement opt-in via requireCsrf() (Phase 8 migration). Middleware
+// now issues the csrf-token cookie for every response.
 import { NextResponse } from "next/server";
 import { ok, safeRoute } from "@/lib/api/response";
 import { requireAuth } from "@/lib/auth/require-role";
+import { checkLimit, profileLimiter } from "@/lib/rate-limit";
 import { deleteAccountSchema } from "@/lib/validators/user";
 import { deleteUserAccount } from "@/lib/services/account";
 
@@ -14,6 +16,7 @@ import { deleteUserAccount } from "@/lib/services/account";
  */
 export const DELETE = safeRoute(async (req: Request) => {
   const session = await requireAuth();
+  await checkLimit(profileLimiter, session.user.id);
   const raw: unknown = await req.json().catch(() => ({}));
   deleteAccountSchema.parse(raw);
   const result = await deleteUserAccount(session.user.id);

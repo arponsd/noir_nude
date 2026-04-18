@@ -18,6 +18,7 @@
     "test": "pnpm run test:unit && pnpm run test:integration",
     "test:unit": "vitest run",
     "test:integration": "cross-env VITEST_SCOPE=integration vitest run",
+    "test:integration:ci": "cross-env VITEST_SCOPE=integration vitest run --no-file-parallelism",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "test:e2e": "playwright test",

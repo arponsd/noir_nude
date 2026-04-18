@@ -3,6 +3,7 @@ import { z } from "zod";
 import { v2 as cloudinary } from "cloudinary";
 import { fail, ok, safeRoute } from "@/lib/api/response";
 import { requireAuth } from "@/lib/auth/require-role";
+import { cartLimiter, checkLimit } from "@/lib/rate-limit";
 import { ERROR_CODES } from "@/lib/constants";
 import { env } from "@/lib/env";
 import { UPLOAD_FOLDERS, type UploadSign } from "@/types/api/uploads";
@@ -14,7 +15,13 @@ const bodySchema = z
   .strict();
 
 export const POST = safeRoute(async (req: Request) => {
-  await requireAuth();
+  const session = await requireAuth();
+  // reason(T-7.S02): throttle Cloudinary signature issuance to prevent a
+  //   compromised session from minting arbitrary upload tokens. Sharing the
+  //   cart bucket (30/min/user) is intentional — one-off avatar/review
+  //   uploads are well under that ceiling and the shared cap limits blast
+  //   radius without adding another limiter.
+  await checkLimit(cartLimiter, `upload:${session.user.id}`);
 
   const raw: unknown = await req.json().catch(() => ({}));
   const { folder } = bodySchema.parse(raw);

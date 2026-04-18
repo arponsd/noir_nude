@@ -2,11 +2,13 @@
 import { NextResponse } from "next/server";
 import { ok, safeRoute } from "@/lib/api/response";
 import { requireAuth } from "@/lib/auth/require-role";
+import { checkLimit, profileLimiter } from "@/lib/rate-limit";
 import { notificationPrefsSchema } from "@/lib/validators/user";
 import { updateNotificationPrefs } from "@/lib/services/profile";
 
 export const PATCH = safeRoute(async (req: Request) => {
   const session = await requireAuth();
+  await checkLimit(profileLimiter, session.user.id);
   const raw: unknown = await req.json().catch(() => ({}));
   const parsed = notificationPrefsSchema.parse(raw);
   const profile = await updateNotificationPrefs(session.user.id, parsed);

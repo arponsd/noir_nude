@@ -22,16 +22,13 @@ const ACCOUNT_LINKS: FooterLink[] = [
 
 const COMPANY_LINKS: FooterLink[] = [
   { href: "/about", label: "About us" },
-  { href: "/journal", label: "Journal" },
-  { href: "/stores", label: "Stores" },
-  { href: "/careers", label: "Careers" },
+  { href: "/contact", label: "Contact" },
+  { href: "/faq", label: "FAQ" },
 ];
 
-const CONNECT_LINKS: FooterLink[] = [
-  { href: "/contact", label: "Contact" },
-  { href: "/help", label: "Help center" },
-  { href: "/shipping", label: "Shipping & returns" },
-  { href: "/privacy", label: "Privacy" },
+const LEGAL_LINKS: FooterLink[] = [
+  { href: "/privacy-policy", label: "Privacy policy" },
+  { href: "/terms", label: "Terms & conditions" },
 ];
 
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
@@ -76,7 +73,7 @@ export default function Footer() {
           <FooterColumn title="Shop" links={SHOP_LINKS} />
           <FooterColumn title="Account" links={ACCOUNT_LINKS} />
           <FooterColumn title="Company" links={COMPANY_LINKS} />
-          <FooterColumn title="Connect" links={CONNECT_LINKS} />
+          <FooterColumn title="Legal" links={LEGAL_LINKS} />
         </div>
 
         <div className="mt-12 grid gap-8 border-t border-[var(--line)] pt-10 md:grid-cols-2 md:items-end">

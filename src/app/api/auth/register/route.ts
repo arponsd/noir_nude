@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { safeRoute } from "@/lib/api/response";
 import { ok } from "@/lib/api/response";
 import { authLimiter, checkLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/rate-limit/client-ip";
 import { registerSchema } from "@/lib/validators/auth";
 import { registerUser } from "@/lib/services/user";
 import { createEmailVerificationToken } from "@/lib/auth/tokens";
@@ -9,13 +10,8 @@ import { sendVerificationEmail } from "@/lib/services/email";
 import { connectDb } from "@/lib/db/connect";
 import logger from "@/lib/utils/logger";
 
-function clientIp(req: Request): string {
-  const header = req.headers.get("x-forwarded-for");
-  return header?.split(",")[0]?.trim() || "unknown";
-}
-
 export const POST = safeRoute(async (req: Request) => {
-  await checkLimit(authLimiter, `register:${clientIp(req)}`);
+  await checkLimit(authLimiter, `register:${getClientIp(req)}`);
   await connectDb();
 
   const raw: unknown = await req.json().catch(() => ({}));

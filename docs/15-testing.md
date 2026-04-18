@@ -52,6 +52,10 @@ Owner: `qa` agent. Every other agent writes tests for their own code; qa owns th
 11. 401/403 on admin route as customer.
 12. Rate limit: 6 failed logins returns 429.
 
+See [`tests/regression-catalog.md`](../tests/regression-catalog.md) for the
+current mapping of each flow to its spec file, test name(s), and tag, plus the
+full list of e2e tags and how to run each subset.
+
 ## Fixtures
 
 - `tests/fixtures/db.ts` — seed helpers callable from any test.

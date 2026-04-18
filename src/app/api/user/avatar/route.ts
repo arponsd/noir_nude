@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { ok, safeRoute } from "@/lib/api/response";
 import { requireAuth } from "@/lib/auth/require-role";
+import { checkLimit, profileLimiter } from "@/lib/rate-limit";
 import { avatarUpdateSchema } from "@/lib/validators/user";
 import { updateAvatar } from "@/lib/services/profile";
 
@@ -12,6 +13,7 @@ import { updateAvatar } from "@/lib/services/profile";
  */
 export const POST = safeRoute(async (req: Request) => {
   const session = await requireAuth();
+  await checkLimit(profileLimiter, session.user.id);
   const raw: unknown = await req.json().catch(() => ({}));
   const { url } = avatarUpdateSchema.parse(raw);
   const profile = await updateAvatar(session.user.id, url);

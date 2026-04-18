@@ -25,9 +25,18 @@ These decisions are **frozen**. Any change requires updating this file first and
 | ------------------------------------------------------- | ------------------ |
 | `POST /api/auth/login`, `/register`, `/forgot-password` | 5 / minute / IP    |
 | `POST /api/orders`                                      | 10 / hour / user   |
+| `POST /api/orders/guest`                                | 10 / hour / IP     |
 | `POST /api/reviews`                                     | 3 / hour / user    |
-| `POST /api/cart/items`                                  | 30 / minute / user |
+| `POST /api/cart/items` (and all cart mutations)         | 30 / minute / user |
+| `POST /api/wishlist/toggle`                             | 30 / minute / user |
+| `POST /api/uploads/sign`                                | 30 / minute / user |
+| `/api/user/**` mutations                                | 30 / minute / user |
+| `/api/addresses/**` mutations                           | 60 / minute / user |
 | Search autocomplete                                     | 60 / minute / IP   |
+
+Additive extension (T-7.S02) — `profileLimiter` (30/min/user) and `addressLimiter`
+(60/min/user) were added in Phase 7. They do not conflict with any previously
+locked row; they tighten routes that previously had no explicit bucket.
 
 ## Cart
 
