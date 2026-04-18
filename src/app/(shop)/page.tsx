@@ -16,7 +16,8 @@ export const metadata = {
     "Clean formulas, quiet design. Skincare, makeup, and fragrance curated for Bangladesh.",
 };
 
-export const dynamic = "force-dynamic";
+// reason: read-only catalog surface — ISR 60s keeps navigation snappy.
+export const revalidate = 60;
 
 function Hero() {
   return (

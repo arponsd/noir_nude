@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
 import { listReviewsForProduct } from "@/lib/services/review";
 import { Order } from "@/lib/db/models";
 import { connectDb } from "@/lib/db/connect";
@@ -14,6 +13,8 @@ import type { ReviewDTO } from "@/types/api/review";
 type Props = {
   productId: string;
   slug: string;
+  /** Session info passed down from PDP so we don't call `auth()` twice. */
+  userId: string | null;
 };
 
 async function findEligibleOrderId(userId: string, productId: string): Promise<string | null> {
@@ -57,16 +58,14 @@ function computeHistogram(items: ReviewDTO[]): Record<1 | 2 | 3 | 4 | 5, number>
   return bucket;
 }
 
-export default async function ProductReviews({ productId, slug }: Props) {
-  const session = await auth();
-  const listing = await listReviewsForProduct(slug, { page: 1, limit: 10 });
-
-  let canReview = false;
-  let orderId: string | null = null;
-  if (session) {
-    orderId = await findEligibleOrderId(session.user.id, productId);
-    canReview = Boolean(orderId);
-  }
+export default async function ProductReviews({ productId, slug, userId }: Props) {
+  // reason: run independent DB calls in parallel — reviews listing doesn't depend on the
+  // verified-buyer lookup, and vice versa. Saves one Atlas round-trip on every PDP load.
+  const [listing, orderId] = await Promise.all([
+    listReviewsForProduct(slug, { page: 1, limit: 10 }),
+    userId ? findEligibleOrderId(userId, productId) : Promise.resolve(null),
+  ]);
+  const canReview = Boolean(orderId);
 
   const avg =
     listing.items.length === 0
@@ -91,7 +90,7 @@ export default async function ProductReviews({ productId, slug }: Props) {
           </div>
         </div>
 
-        {session ? (
+        {userId ? (
           canReview && orderId ? (
             <WriteReviewDialog productId={productId} orderId={orderId} />
           ) : (
@@ -136,6 +135,29 @@ export default async function ProductReviews({ productId, slug }: Props) {
           </div>
         </>
       )}
+    </section>
+  );
+}
+
+export function ProductReviewsFallback() {
+  return (
+    <section
+      id="reviews"
+      className="mt-16 border-t border-[var(--line)] pt-10"
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="h-8 w-40 animate-pulse rounded-[var(--radius-sm)] bg-[var(--bg-alt)]" />
+      <div className="mt-6 h-4 w-60 animate-pulse rounded-[var(--radius-sm)] bg-[var(--bg-alt)]" />
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-28 animate-pulse rounded-[var(--radius-md)] bg-[var(--bg-alt)]"
+          />
+        ))}
+      </div>
+      <span className="sr-only">Loading reviews…</span>
     </section>
   );
 }

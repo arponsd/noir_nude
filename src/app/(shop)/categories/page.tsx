@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   description: "Browse every category — skincare, makeup, fragrance, and more.",
 };
 
-export const dynamic = "force-dynamic";
+// reason: read-only catalog surface — ISR 60s keeps navigation snappy.
+export const revalidate = 60;
 
 export default async function CategoriesPage() {
   const tree: CategoryTree[] = await listCategoryTreeService();

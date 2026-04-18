@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Star } from "lucide-react";
 import BadgeChip from "@/components/shop/BadgeChip";
 import ImageGallery from "@/components/shop/ImageGallery";
 import PriceBlock from "@/components/shop/PriceBlock";
 import ProductGrid from "@/components/shop/ProductGrid";
 import ProductPurchasePanel from "@/components/shop/ProductPurchasePanel";
-import ProductReviews from "@/components/shop/ProductReviews";
+import ProductReviews, { ProductReviewsFallback } from "@/components/shop/ProductReviews";
 import { toCardDTOs } from "@/components/shop/adapters";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -58,7 +59,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<Pa
   if (!product) notFound();
 
   const [related, session] = await Promise.all([getRelatedProductsService(slug, 4), auth()]);
-  const isAuthenticated = Boolean(session?.user?.id);
+  const userId = session?.user?.id ?? null;
+  const isAuthenticated = Boolean(userId);
 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
@@ -269,7 +271,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<Pa
           </Tabs>
         </section>
 
-        <ProductReviews productId={product.id} slug={product.slug} />
+        <Suspense fallback={<ProductReviewsFallback />}>
+          <ProductReviews productId={product.id} slug={product.slug} userId={userId} />
+        </Suspense>
 
         {related.length > 0 ? (
           <section className="mt-20 border-t border-[var(--line)] pt-10">
@@ -286,4 +290,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<Pa
   );
 }
 
-export const dynamic = "force-dynamic";
+// reason: PDP content is owner-agnostic and changes rarely — ISR for 60s
+// keeps nav snappy. Admin product mutations already call revalidatePath.
+export const revalidate = 60;
