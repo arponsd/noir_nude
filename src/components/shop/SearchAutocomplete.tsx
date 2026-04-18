@@ -36,7 +36,8 @@ export default function SearchAutocomplete({
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [highlight, setHighlight] = React.useState(-1);
-  const [inputId] = React.useState(() => `search-${Math.random().toString(36).slice(2, 8)}`);
+  const reactId = React.useId();
+  const inputId = `search-${reactId.replace(/:/g, "")}`;
   const listboxId = `${inputId}-listbox`;
 
   const abortRef = React.useRef<AbortController | null>(null);
