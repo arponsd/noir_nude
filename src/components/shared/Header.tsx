@@ -10,7 +10,7 @@ import { useCartDrawer } from "@/components/shared/CartDrawer";
 import { cn } from "@/lib/utils/cn";
 
 const NAV_ITEMS = [
-  { href: "/shop", label: "Shop" },
+  { href: "/products", label: "Shop" },
   { href: "/categories", label: "Categories" },
   { href: "/about", label: "About" },
 ] as const;
