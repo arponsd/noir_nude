@@ -36,7 +36,10 @@ export default function SearchAutocomplete({
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [highlight, setHighlight] = React.useState(-1);
-  const [inputId] = React.useState(() => `search-${Math.random().toString(36).slice(2, 8)}`);
+  const reactId = React.useId();
+  // reason: useId output varies by React major (`:r0:`, `«r0»`, etc.). Strip
+  // non-alphanumerics so the id stays valid in CSS selectors + aria-controls.
+  const inputId = `search-${reactId.replace(/[^a-z0-9]/gi, "")}`;
   const listboxId = `${inputId}-listbox`;
 
   const abortRef = React.useRef<AbortController | null>(null);
