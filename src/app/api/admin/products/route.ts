@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { ok, safeRoute } from "@/lib/api/response";
 import { requireRole } from "@/lib/auth/require-role";
 import { connectDb } from "@/lib/db/connect";
@@ -8,6 +9,13 @@ import { adminListProducts, createProduct } from "@/lib/services/admin-product";
 export const dynamic = "force-dynamic";
 
 const ADMIN_ROLES = ["admin", "manager"] as const;
+
+function revalidatePublicCatalog(slug?: string): void {
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/categories");
+  if (slug) revalidatePath(`/products/${slug}`);
+}
 
 export const GET = safeRoute(async (req: Request) => {
   await requireRole(ADMIN_ROLES);
@@ -24,5 +32,6 @@ export const POST = safeRoute(async (req: Request) => {
   const raw: unknown = await req.json().catch(() => ({}));
   const parsed = createProductSchema.parse(raw);
   const result = await createProduct(parsed, session.user.id);
+  revalidatePublicCatalog(result.slug);
   return NextResponse.json(ok(result), { status: 201 });
 });
