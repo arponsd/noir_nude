@@ -212,4 +212,5 @@ export default async function ProductsListingPage({
   );
 }
 
-export const dynamic = "force-dynamic";
+// reason: read-only catalog surface — ISR 60s keeps navigation snappy.
+export const revalidate = 60;
