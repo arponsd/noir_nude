@@ -1,5 +1,5 @@
-import { Schema, model, models } from "mongoose";
-import type mongoose from "mongoose";
+import mongoose from "mongoose";
+const { Schema, model, models } = mongoose;
 import type { InferSchemaType, Model, Types } from "mongoose";
 
 const ACTIVITY_ENTITIES = ["order", "product", "coupon", "banner", "review", "user"] as const;

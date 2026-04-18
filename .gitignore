@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+.yarn/
+.npm/
 
 # Next.js
 .next/
@@ -12,23 +14,36 @@ next-env.d.ts
 build/
 dist/
 
-# Environment
+# Environment — never commit real secrets. .env.example is whitelisted below.
 .env
-.env*.local
-.env.development
-.env.production
-.env.staging
-# allow the example to be committed
+.env.*
 !.env.example
+!.env.example.*
+# Belt-and-braces: any file named with the word "secret" stays out
+*.secret
+*.secret.*
+secrets.json
+credentials.json
 
 # Test output
 coverage/
 playwright-report/
 test-results/
+playwright/.cache/
+playwright/.auth/
 .nyc_output/
+
+# Lighthouse CI
+.lighthouseci/
+lhci-reports/
+
+# Bundle analysis
+/analyze/
+.next/analyze/
 
 # Logs
 *.log
+logs/
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
@@ -37,25 +52,41 @@ lerna-debug.log*
 
 # OS
 .DS_Store
+.AppleDouble
+.LSOverride
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+Icon?
 
-# Editors
+# Editors / IDE
 .idea/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/launch.json
+.history/
+.fleet/
+.zed/
+*.code-workspace
 *.swp
 *.swo
 *~
 
-# Debug
+# Patch / merge artifacts
+*.orig
+*.rej
+*.patch
+
+# Project-local scratch
 .claude-worklog
 WORKLOG.md
 .worklog/
+/scratch/
+/notes/
+/tmp/
+/temp/
 
 # TypeScript incremental
 *.tsbuildinfo
@@ -63,27 +94,49 @@ WORKLOG.md
 # Sentry
 .sentryclirc
 
-# Cloudinary upload cache (if any local)
+# Cloudinary / upload cache
 .cloudinary-cache/
 
-# Generated
+# Generated public files
 /public/sitemap*.xml
 /public/robots.txt
 
-# Lock files from wrong package managers
+# Lock files from the wrong package manager (pnpm-lock.yaml is the source of truth)
 package-lock.json
 yarn.lock
+bun.lockb
 
-# Local DB dumps
+# Local DB dumps / backups
 *.dump
 *.bson
+*.sql.gz
 /dumps/
+/backups/
 
 # Runtime
 *.pid
 *.seed
 *.pid.lock
+pids/
 
-# Misc
+# Build caches
 .cache/
 .turbo/
+.rush/
+.parcel-cache/
+.swc/
+
+# Generated PWA / manifest
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+
+# Claude Code local
+.claude/settings.local.json
+
+# Docker
+.dockerignore.local
+
+# git-filter-repo artifacts
+.git-redactions.txt

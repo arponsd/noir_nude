@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import logger from "@/lib/utils/logger";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    logger.warn({ csp: body }, "CSP violation reported");
+    // reason: pino's worker transport is unstable in Next dev/edge; use console directly
+    // for CSP reports so the endpoint never crashes the process.
+    console.warn("[csp-violation]", JSON.stringify(body));
   } catch {
     // body may not be JSON; drop silently
   }

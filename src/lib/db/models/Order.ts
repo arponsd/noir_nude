@@ -1,5 +1,5 @@
-import { Schema, model, models } from "mongoose";
-import type mongoose from "mongoose";
+import mongoose from "mongoose";
+const { Schema, model, models } = mongoose;
 import type { InferSchemaType, Model, Query } from "mongoose";
 import { ORDER_STATUSES } from "@/lib/constants";
 

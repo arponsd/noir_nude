@@ -3,7 +3,8 @@
 // and single-use tracking for password reset tokens, so this sibling collection is
 // colocated in the auth module as an MVP compromise.
 
-import { Schema, model, models } from "mongoose";
+import mongoose from "mongoose";
+const { Schema, model, models } = mongoose;
 import type { Model, InferSchemaType, Types } from "mongoose";
 
 export const AUTH_TOKEN_TYPES = ["email_verify", "password_reset"] as const;
